@@ -1,5 +1,7 @@
 import numpy as np
 import random
+from copy import deepcopy
+from parser import *
 
 class Unit:
     sequence= [] #array of sequence numbers included in this unit
@@ -31,14 +33,34 @@ class SpectrumSEQ: #TODO
     sequence = [] #just 12345678
     strings = [] #according to sequence AGTA GTAC etc
 
-    def __init__(self, arr):
-        self.sequence.append(0) #firstOne
-        for i in range(1,len(arr)):
-            if getCost()
+    # def __init__(self, arr):
+    #     self.sequence.append(0) #firstOne
+    #     for i in range(1,len(arr)):
+    #         if getCost()
 
 
 
+    def getChunks(self, array):
+        localArray = deepcopy(array)
+        costs = getMatrixOfCosts(localArray)
 
+        for row in range(len(localArray)):
+            numOfNexts = 0
+            potentialNextPosition = 0
+            for col in range(len(localArray)):
+                if (costs[row,col] == 1):
+                    numOfNexts = numOfNexts + 1
+                    # save the last (and hopefuly only) next one
+                    potentialNextPosition = col
+            
+            if (numOfNexts == 1):
+                # update in both places
+                newValue = localArray[row] + localArray[potentialNextPosition][-1:]
+                localArray[:] = [newValue if (x == localArray[row] or x == localArray[potentialNextPosition]) else x for x in localArray]
+            
+        return list(dict.fromkeys(localArray))
+
+                
 
 
 
@@ -128,3 +150,12 @@ class GeneticGeneration:
         for mutant in mutatedOffspring:
             mutant.calculateFitness(self.spectrum)
         return self.offspringReplaceGenerationMember(mutatedOffspring, parentX, parentY) #return true if the generation changed
+
+
+if __name__ == '__main__':
+    testArray = ["CGAA", "GAAC", "AACT", "TTTA", "TTAC", "TTAG", "AAAA", "BCDE", "ABCD"]
+    
+    spec = SpectrumSEQ()
+    result = spec.getChunks(testArray)
+
+    print("Na wejsciu:", testArray, "\nNa chunki:", result)
