@@ -78,7 +78,7 @@ def getMatrices(N = defN, K = defK, sqne = defsqne, pose = defpose):
 
 if __name__ == '__main__':
     # valuesAndPosition = getValuesFromUrl()
-    # print(getCost("ACGTA", "ACGTA"))
+    print(getCost("ACGTA", "ACGTA"))
     # print(getCost("ACGTA", "CGTAA"))
     # print(getCost("CGTAA", "ACGTA"))
     createMatrixOfCosts(["ACGTA","CGTAA","GTACC", "TACCC", "ATCGT", "CCCCC"])
