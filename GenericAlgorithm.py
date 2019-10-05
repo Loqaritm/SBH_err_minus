@@ -34,10 +34,7 @@ class SpectrumSEQ: #TODO
     def __init__(self, arr):
         self.sequence.append(0) #firstOne
         for i in range(1,len(arr)):
-            if getCost()
-
-
-
+            if getCost(arr[0], arr[i])
 
 
 
