@@ -15,6 +15,8 @@ class ExactAlgorithm:
         self.minCost = MAXVAL
         self.minPath = ""
         self.position = position
+        
+        self.listOfPoints = []
 
     def findBestRoute(self):
         nothing = 0
@@ -36,10 +38,10 @@ class ExactAlgorithm:
             if(visited[nextPoint] == 0):
                 # print("my depth:", depth, "preparing to visit next")
                 allVisitedFlag = False
-                cost = cost + nextPointCost
+                localCost = cost + nextPointCost
                 nextPointValue = self.values[self.position][nextPoint]
-                path = path + nextPointValue[-nextPointCost:]
-                self.dfs(nextPoint, visited, cost, path, depth + 1)
+                localPath = path + nextPointValue[-nextPointCost:]
+                self.dfs(nextPoint, visited, localCost, localPath, depth + 1)
 
         if (allVisitedFlag and cost < self.minCost):
             self.minCost = deepcopy(cost)
@@ -47,8 +49,8 @@ class ExactAlgorithm:
             print("New best path found! with cost:", self.minCost, "and path:", self.minPath)
 
 if __name__ == '__main__':
-    # algorithm = ExactAlgorithm(100, 10, 20, 20)
-    algorithm = ExactAlgorithm(50, 5, 5, 0)
+    algorithm = ExactAlgorithm(100, 10, 20, 20)
+    # algorithm = ExactAlgorithm(50, 5, 5, 0)
     print("values in first position:", algorithm.values[0], "len:", len(algorithm.values[0]))
 
     #get cost matrix
