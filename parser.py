@@ -23,16 +23,22 @@ def getValuesFromUrl(N, K, sqne, pose, shouldPrint = False):
         print(root.tag, root.attrib)
 
     probe = root.find('probe')
+    start = root.attrib['start']
+    length = root.attrib['length']
 
     valuesAndPosition = [[],[],[],[],[]]
+    # add the starting point as the first element of first position
+    valuesAndPosition[0].append(start)
 
     for cell in probe:
         if (shouldPrint):
             print(cell.tag, cell.attrib['position'], cell.text)
         position = int(cell.attrib['position'])
-        valuesAndPosition[position].append(cell.text) 
+        # start sometimes is and sometimes isn't in values. We've appended it as a first element of values
+        if (cell.text != start):
+            valuesAndPosition[position].append(cell.text)
     
-    return valuesAndPosition
+    return valuesAndPosition, length, start
 
 def getCost(first, second):
     # they need to be the same len
