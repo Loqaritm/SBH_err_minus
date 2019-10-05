@@ -5,7 +5,7 @@ class ExactAlgorithm:
     MAXVAL = 10000
 
     def __init__(self, N, K, sqne, pose):
-        self.values, self.length, self.start = getValuesFromUrl(N, K, sqne, pose)
+        self.values = getValuesFromUrl(N, K, sqne, pose)
         self.path = ""
 
     # gets cost matrix and visited matrix for specified position
@@ -58,5 +58,4 @@ if __name__ == '__main__':
     # algorithm.values[algorithm.position][startPoint]
     algorithm.dfs(startPoint, algorithm.visited, 0, algorithm.values[algorithm.position][startPoint], 0)
     print("=========\nBest path returned\n", algorithm.minCost, algorithm.minPath, len(algorithm.minPath))
-    print(algorithm.length)
 
