@@ -5,7 +5,7 @@ class ExactAlgorithm:
         self.values = getValuesFromUrl(N, K, sqne, pose)
 
 
-
 if __name__ == '__main__':
     algorithm = ExactAlgorithm(100, 10, 20, 20)
-    print(algorithm.values)
+    print(algorithm.values[0])
+

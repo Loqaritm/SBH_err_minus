@@ -51,7 +51,7 @@ def getCost(first, second):
     
     return len(first)
 
-def createMatrixOfCosts(valuesForOnePosition):
+def getMatrixOfCosts(valuesForOnePosition):
     matrix = np.full((len(valuesForOnePosition), len(valuesForOnePosition)), MAXVAL)
     rows, cols = matrix.shape
 
