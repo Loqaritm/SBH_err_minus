@@ -2,32 +2,36 @@ import urllib.request
 import xml.etree.ElementTree as ET
 import numpy as np
 
-N = 100
-K = 10
-sqne = 20
-pose = 20
+defN = 100
+defK = 10
+defsqne = 20
+defpose = 20
+MAXVAL = 100000
+positions = 5
 
-url = "http://www.piotr.e.wawrzyniak.doctorate.put.poznan.pl/bio.php?n=" + str(N) +"&k="+ str(K) +"&mode=basic&intensity=0&position=1&sqpe=0&sqne=" + str(sqne) + "&pose=" + str(pose)
+# url = "http://www.piotr.e.wawrzyniak.doctorate.put.poznan.pl/bio.php?n=" + str(N) +"&k="+ str(K) +"&mode=basic&intensity=0&position=1&sqpe=0&sqne=" + str(sqne) + "&pose=" + str(pose)
 
-def getValuesFromUrl():
+def getValuesFromUrl(N, K, sqne, pose, shouldPrint = False):
+    url = "http://www.piotr.e.wawrzyniak.doctorate.put.poznan.pl/bio.php?n=" + str(N) +"&k="+ str(K) +"&mode=basic&intensity=0&position=1&sqpe=0&sqne=" + str(sqne) + "&pose=" + str(pose)
+
     contents = urllib.request.urlopen(url)
 
     root = ET.parse(contents).getroot()
     
-    # just a check if works 
-    print(root.tag, root.attrib)
+    if (shouldPrint):
+        # just a check if works 
+        print(root.tag, root.attrib)
 
     probe = root.find('probe')
 
     valuesAndPosition = [[],[],[],[],[]]
 
     for cell in probe:
-        print(cell.tag, cell.attrib['position'], cell.text)
+        if (shouldPrint):
+            print(cell.tag, cell.attrib['position'], cell.text)
         position = int(cell.attrib['position'])
         valuesAndPosition[position].append(cell.text) 
     
-    print(valuesAndPosition)
-
     return valuesAndPosition
 
 def getCost(first, second):
@@ -37,7 +41,7 @@ def getCost(first, second):
 
     # iterate from 0 to K, -1 because the first string is checked from 1 to K so we will be adding +1
     # this is the starting point of check
-    for i in range(len(first) - 1):
+    for i in range(1, len(first)):
         firstSubstring = first[i:]
         secondSubstring = second[:len(second)-i]
         # check if substrings are the same 
@@ -47,9 +51,35 @@ def getCost(first, second):
     
     return len(first)
 
-def createMatrixOfCosts(valuesAndPosition):
-    nothing = 1
+def createMatrixOfCosts(valuesForOnePosition):
+    matrix = np.full((len(valuesForOnePosition), len(valuesForOnePosition)), MAXVAL)
+    rows, cols = matrix.shape
+
+    for x in range(0, rows):
+        for y in range(0, cols):
+            if (x!=y):
+                matrix[x,y] = getCost(valuesForOnePosition[x], valuesForOnePosition[y])
+            else:
+                matrix[x,y] = MAXVAL
+    
+    return matrix
+
+# dont use this - this will get new data each time
+def getMatrices(N = defN, K = defK, sqne = defsqne, pose = defpose):
+    valuesAndPosition = getValuesFromUrl(N, K, sqne, pose)
+    matrices = np.asarray(valuesAndPosition).reshape(positions)
+
+    for i, matrix in enumerate(matrices):
+        matrices[i] = createMatrixOfCosts(matrix)
+
+    # return all matrices of costs
+    return matrices
+        
 
 if __name__ == '__main__':
     # valuesAndPosition = getValuesFromUrl()
-    print(getCost("ACGTA", "CATAT"))
+    # print(getCost("ACGTA", "ACGTA"))
+    # print(getCost("ACGTA", "CGTAA"))
+    # print(getCost("CGTAA", "ACGTA"))
+    createMatrixOfCosts(["ACGTA","CGTAA","GTACC", "TACCC", "ATCGT", "CCCCC"])
+    getMatrices()
