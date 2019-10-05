@@ -38,7 +38,7 @@ def getValuesFromUrl(N, K, sqne, pose, shouldPrint = False):
         if (cell.text != start):
             valuesAndPosition[position].append(cell.text)
     
-    return valuesAndPosition, length, start
+    return valuesAndPosition
 
 def getCost(first, second):
     # they need to be the same len
@@ -76,7 +76,7 @@ def getMatrices(N = defN, K = defK, sqne = defsqne, pose = defpose):
     matrices = np.asarray(valuesAndPosition).reshape(positions)
 
     for i, matrix in enumerate(matrices):
-        matrices[i] = createMatrixOfCosts(matrix)
+        matrices[i] = getMatrixOfCosts(matrix)
 
     # return all matrices of costs
     return matrices
@@ -87,5 +87,5 @@ if __name__ == '__main__':
     print(getCost("ACGTA", "ACGTA"))
     # print(getCost("ACGTA", "CGTAA"))
     # print(getCost("CGTAA", "ACGTA"))
-    createMatrixOfCosts(["ACGTA","CGTAA","GTACC", "TACCC", "ATCGT", "CCCCC"])
+    getMatrixOfCosts(["ACGTA","CGTAA","GTACC", "TACCC", "ATCGT", "CCCCC"])
     getMatrices()
