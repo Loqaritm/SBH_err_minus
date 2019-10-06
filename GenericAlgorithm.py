@@ -153,7 +153,7 @@ class GeneticGeneration:
 
 
 if __name__ == '__main__':
-    testArray = ["CGAA", "GAAC", "AACT", "TTTA", "TTAC", "TTAG", "AAAA", "BCDE", "ABCD"]
+    testArray = ["EEEE","CGAA", "GAAC", "AACT", "TTTA", "TTAC", "TTAG", "AAAA", "BCDE", "ABCD"]
     
     spec = SpectrumSEQ()
     result = spec.getChunks(testArray)

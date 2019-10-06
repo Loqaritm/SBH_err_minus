@@ -1,27 +1,35 @@
 from parser import *
 from copy import deepcopy
 
+N = 100
+K = 10
+sqne = 20
+pose = 20
+
 class ExactAlgorithm:
     MAXVAL = 10000
 
     def __init__(self, N, K, sqne, pose):
         self.values = getValuesFromUrl(N, K, sqne, pose)
         self.path = ""
+        self.cost = 0
+        self.minPath = ""
+
 
     # gets cost matrix and visited matrix for specified position
     def setUpForPosition(self, position):
         self.costMatrix = getMatrixOfCosts(self.values[position])
         self.visited = np.zeros(self.costMatrix.shape[0])
-        self.minCost = MAXVAL
-        self.minPath = ""
         self.position = position
+        # set this up for every position so that it gets reduced over time each time
+        self.minCost = MAXVAL
         
         self.listOfPoints = []
 
     def findBestRoute(self):
         nothing = 0
         
-    def dfs(self, startPoint, visitedPoints, costNow, pathNow, depth):
+    def dfs(self, startPoint, visitedPoints, costNow, pathNow, depth = 0):
         cost = deepcopy(costNow)
         path = deepcopy(pathNow)
         visited = deepcopy(visitedPoints)
@@ -45,19 +53,30 @@ class ExactAlgorithm:
 
         if (allVisitedFlag and cost < self.minCost):
             self.minCost = deepcopy(cost)
+            # needed as the minCost is just a check to see if things get better
+            self.cost = deepcopy(cost)
             self.minPath = deepcopy(path)
             print("New best path found! with cost:", self.minCost, "and path:", self.minPath)
 
 if __name__ == '__main__':
-    algorithm = ExactAlgorithm(100, 10, 20, 20)
+    algorithm = ExactAlgorithm(N, K, sqne, pose)
     # algorithm = ExactAlgorithm(50, 5, 5, 0)
     print("values in first position:", algorithm.values[0], "len:", len(algorithm.values[0]))
 
-    #get cost matrix
+    # get cost matrix
     algorithm.setUpForPosition(0)
 
+    # first start point is the first in values
     startPoint = 0
-    # algorithm.values[algorithm.position][startPoint]
-    algorithm.dfs(startPoint, algorithm.visited, 0, algorithm.values[algorithm.position][startPoint], 0)
-    print("=========\nBest path returned\n", algorithm.minCost, algorithm.minPath, len(algorithm.minPath))
+
+    cost = 0
+    path = algorithm.values[algorithm.position][startPoint]
+    for i in range(5):
+        algorithm.dfs(startPoint, algorithm.visited, cost, path)
+        print("=========\nBest path returned for position", algorithm.position,"\n", algorithm.minCost, algorithm.minPath, len(algorithm.minPath))
+        cost = algorithm.minCost
+        path = algorithm.minPath
+        algorithm.setUpForPosition(i+1)
+
+
 
