@@ -1,6 +1,8 @@
 import numpy as np
 import random
+from copy import deepcopy
 from parser import *
+
 class Unit:
     sequence= [] #array of sequence numbers included in this unit
     name = '' #current unit string name eg. ACGAGT...[tbd]
@@ -44,32 +46,49 @@ class SpectrumSEQ: #TODO
     sequence = [] #just 12345678
     strings = [] #according to sequence AGTA GTAC etc
     DesiredLength = 50
-
-    def __init__(self, arr, length):
-        length = 6
+    def __init__(self, arr):
+        # length = 6
         #firstOne
-        count =0
-        elemId =0
-        for i in range(1,len(arr)):
-            if getCost(arr[0], arr[i]) == 1:
-                elemId = i
-                count+=1    #check for unique connections
-        if count==1:
-            self.strings.append(arr[0] + arr[elemId][-1:])
-            arr.remove(arr[elemId])
-            arr.remove(arr[0])
-        else:
-            self.strings.append(arr[0])
-            arr.remove(arr[0])
+        # count =0
+        # elemId =0
+        # for i in range(1,len(arr)):
+        #     if getCost(arr[0], arr[i]) == 1:
+        #         elemId = i
+        #         count+=1    #check for unique connections
+        # if count==1:
+        #     self.strings.append(arr[0] + arr[elemId][-1:])
+        #     arr.remove(arr[elemId])
+        #     arr.remove(arr[0])
+        # else:
+        #     self.strings.append(arr[0])
+        #     arr.remove(arr[0])
+        self.strings=self.getChunks(arr)
+        for i in range(len(self.strings)):
+            self.sequence.append(i)
+            print(i, "    ")
+            print(self.strings[i])
 
-        while len(arr) > 0: #all oligonucleotyds
+    def getChunks(self, array):
+        localArray = deepcopy(array)
+        costs = getMatrixOfCosts(localArray)
 
+        for row in range(len(localArray)):
+            numOfNexts = 0
+            potentialNextPosition = 0
+            for col in range(len(localArray)):
+                if (costs[row, col] == 1):
+                    numOfNexts = numOfNexts + 1
+                    # save the last (and hopefuly only) next one
+                    potentialNextPosition = col
 
-            while(asdf):
-                for i in range(len(arr)):
-                    if i != chunkId and getCost(arr[chunkId], arr[i])==1:
-                        count+=1
+            if (numOfNexts == 1):
+                # update in both places
+                newValue = localArray[row] + localArray[potentialNextPosition][-1:]
+                localArray[:] = [
+                    newValue if (x == localArray[row] or x == localArray[potentialNextPosition]) else x for x in
+                    localArray]
 
+        return list(dict.fromkeys(localArray))
 
 
 class GeneticGeneration:
@@ -181,3 +200,12 @@ class GeneticGeneration:
         for mutant in mutatedOffspring:
             mutant.calculateFitness(spectrum=self.spectrum, n=self.chainLength)
         return self.offspringReplaceGenerationMember(mutatedOffspring, parentX, parentY) #return true if the generation changed
+
+
+if __name__ == '__main__':
+    testArray = ["CGAA", "GAAC", "AACT", "TTTA", "TTAC", "TTAG", "AAAA", "BCDE", "ABCD"]
+
+    spec = SpectrumSEQ(arr=testArray)
+
+
+    print("Na wejsciu:", testArray, "\nNa chunki:", result)
