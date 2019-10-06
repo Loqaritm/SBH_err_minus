@@ -42,12 +42,14 @@ class SpectrumSEQ: #TODO
 
     def getChunks(self, array):
         localArray = deepcopy(array)
+        sizeOfMers = len(array[0])
         costs = getMatrixOfCosts(localArray)
 
         for row in range(len(localArray)):
             numOfNexts = 0
             potentialNextPosition = 0
             for col in range(len(localArray)):
+                # print("checking ", localArray[row], "with", localArray[col])
                 if (costs[row,col] == 1):
                     numOfNexts = numOfNexts + 1
                     # save the last (and hopefuly only) next one
@@ -55,8 +57,14 @@ class SpectrumSEQ: #TODO
             
             if (numOfNexts == 1):
                 # update in both places
-                newValue = localArray[row] + localArray[potentialNextPosition][len(localArray[row])-1:]
+                # print("SQUASHING", localArray[row], "with", localArray[potentialNextPosition])
+                newValue = localArray[row] + localArray[potentialNextPosition][sizeOfMers-1:]
+                # print("BEFORE SQUASH", localArray)
                 localArray[:] = [newValue if (x == localArray[row] or x == localArray[potentialNextPosition]) else x for x in localArray]
+                # print("AFTER SQUASH", localArray)
+            # else:
+                # print("COULDN'T SQUASH", localArray[row])
+                # print(localArray)
         return list(dict.fromkeys(localArray))
 
                 
