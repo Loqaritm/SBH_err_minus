@@ -55,9 +55,8 @@ class SpectrumSEQ: #TODO
             
             if (numOfNexts == 1):
                 # update in both places
-                newValue = localArray[row] + localArray[potentialNextPosition][-1:]
+                newValue = localArray[row] + localArray[potentialNextPosition][len(localArray[row])-1:]
                 localArray[:] = [newValue if (x == localArray[row] or x == localArray[potentialNextPosition]) else x for x in localArray]
-            
         return list(dict.fromkeys(localArray))
 
                 
@@ -153,7 +152,7 @@ class GeneticGeneration:
 
 
 if __name__ == '__main__':
-    testArray = ["EEEE","CGAA", "GAAC", "AACT", "TTTA", "TTAC", "TTAG", "AAAA", "BCDE", "ABCD"]
+    testArray = ['TTCAGA', 'AAACTC', 'AGAGCT', 'CAAACT', 'CAGAGC', 'CCAAAC', 'CCCAAA', 'CCCCAA', 'CCTATT', 'CTGGTG', 'GAGCTG', 'GCTGGT', 'GGAGCC', 'GTATGG', 'GTGCCC', 'TCAGAG', 'TGCCCC']
     
     spec = SpectrumSEQ()
     result = spec.getChunks(testArray)

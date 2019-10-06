@@ -1,10 +1,10 @@
 from parser import *
 from copy import deepcopy
 
-N = 100
-K = 10
-sqne = 20
-pose = 20
+N = 20
+K = 5
+sqne = 5
+pose = 0
 
 class ExactAlgorithm:
     MAXVAL = 10000
@@ -14,6 +14,7 @@ class ExactAlgorithm:
         self.path = ""
         self.cost = 0
         self.minPath = ""
+        self.K = K
 
 
     # gets cost matrix and visited matrix for specified position
@@ -58,25 +59,47 @@ class ExactAlgorithm:
             self.minPath = deepcopy(path)
             print("New best path found! with cost:", self.minCost, "and path:", self.minPath)
 
+    def removeAlreadyUsed(self, path):
+        alreadyUsed = []
+        for i in range(len(path) - self.K + 1):
+            alreadyUsed.append(path[i:i+self.K])
+
+        print("alreadyUsed values", alreadyUsed)
+        print("values before removal", self.values)
+        self.values[:] = [x for x in self.values if x not in alreadyUsed]
+        print("values after removal", self.values)
+
 if __name__ == '__main__':
     algorithm = ExactAlgorithm(N, K, sqne, pose)
     # algorithm = ExactAlgorithm(50, 5, 5, 0)
-    print("values in first position:", algorithm.values[0], "len:", len(algorithm.values[0]))
+    # print("values in first position:", algorithm.values[0], "len:", len(algorithm.values[0]))
 
     # get cost matrix
-    algorithm.setUpForPosition(0)
+    # algorithm.setUpForPosition(0)
+    # algorithm.dfs(0, algorithm.visited, 0, algorithm.values[0][0])
 
     # first start point is the first in values
     startPoint = 0
-
-    cost = 0
-    path = algorithm.values[algorithm.position][startPoint]
+    startPath = algorithm.values[0][startPoint]
     for i in range(5):
-        algorithm.dfs(startPoint, algorithm.visited, cost, path)
-        print("=========\nBest path returned for position", algorithm.position,"\n", algorithm.minCost, algorithm.minPath, len(algorithm.minPath))
-        cost = algorithm.minCost
-        path = algorithm.minPath
-        algorithm.setUpForPosition(i+1)
+        if(i==0):
+            algorithm.minPath = startPath
+        
+        if (i!=0):
+            # remove already mers we've used in previous positions
+            algorithm.removeAlreadyUsed(algorithm.minPath)
+            # insert the last from previous iteration as the first of this one
+            algorithm.values[i].insert(0, algorithm.minPath[-algorithm.K:])
+        
+        print("values in position",i,":", algorithm.values[i], "len:", len(algorithm.values[i]))
+
+        algorithm.setUpForPosition(i)
+        algorithm.dfs(startPoint, algorithm.visited, algorithm.cost, algorithm.minPath)
+        print("=========\nBest path returned for position", algorithm.position,"\n", algorithm.minCost, algorithm.minPath, len(algorithm.minPath), "\n")
 
 
 
+# TODO:
+# stop if over the len of position
+# push everything not chosen to next position
+# add value better if more used
