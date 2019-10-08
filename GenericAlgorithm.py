@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from copy import deepcopy
-from parser import *
+from DNAparser import *
 
 class Unit:
     sequence= [] #array of sequence numbers included in this unit

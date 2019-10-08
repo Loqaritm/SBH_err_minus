@@ -9,8 +9,6 @@ defpose = 20
 MAXVAL = 100000
 positions = 5
 
-# url = "http://www.piotr.e.wawrzyniak.doctorate.put.poznan.pl/bio.php?n=" + str(N) +"&k="+ str(K) +"&mode=basic&intensity=0&position=1&sqpe=0&sqne=" + str(sqne) + "&pose=" + str(pose)
-
 def getValuesFromUrl(N, K, sqne, pose, shouldPrint = False):
     url = "http://www.piotr.e.wawrzyniak.doctorate.put.poznan.pl/bio.php?n=" + str(N) +"&k="+ str(K) +"&mode=basic&intensity=0&position=1&sqpe=0&sqne=" + str(sqne) + "&pose=" + str(pose)
 
@@ -91,7 +89,5 @@ def getMatrices(N = defN, K = defK, sqne = defsqne, pose = defpose):
 if __name__ == '__main__':
     # valuesAndPosition = getValuesFromUrl()
     print(getCost("ACGTA", "ACGTA"))
-    # print(getCost("ACGTA", "CGTAA"))
-    # print(getCost("CGTAA", "ACGTA"))
     getMatrixOfCosts(["ACGTA","CGTAA","GTACC", "TACCC", "ATCGT", "CCCCC"])
     getMatrices()
