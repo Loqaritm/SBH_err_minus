@@ -10,10 +10,23 @@ class Unit:
     # def __init__(self, sequence, name):
     #     self.name=''
 
-    def calculateFitness(self, spectrum):
+    def calculateFitness(self, spectrum, n): #this is spectrum created from chunks
         self.fitness = 0
+        self.name = spectrum.strings[0]
+        for i in range(1,len(self.sequence)):
+            self.fitness+= self.addChunkToUnitNameByChunkID(spectrum, i) #dla wszystkich chunków oprócz pierwszego!
+        print(self.name)
+        difference = len(self.name)-spectrum.DesiredLength
+
         #return self.fitness
 
+    def addChunkToUnitNameByChunkID(self, spectrum, id): #this function adds chunk eg. ATTAT to GCCATT name creating GCCATTAT name and returns number of fitted
+        for i in reversed(range(1,len(spectrum.strings[id]))):   #reversed order                                   #nucleotyds - in this example ATT=3
+            if self.name[-i:]==spectrum.strings[id][:i]:
+                self.name = self.name + spectrum.strings[id][i:]
+                return i
+        self.name = self.name +spectrum.strings[id]
+        return 0
 
     def fixoffspring(self, spectrum):#offspring sequence fixing
         for i in range(len(self.sequence)):
@@ -32,54 +45,79 @@ class Unit:
 class SpectrumSEQ: #TODO
     sequence = [] #just 12345678
     strings = [] #according to sequence AGTA GTAC etc
-
-    # def __init__(self, arr):
-    #     self.sequence.append(0) #firstOne
-    #     for i in range(1,len(arr)):
-    #         if getCost()
-
-
+    DesiredLength = 50
+    def __init__(self, arr):
+        # length = 6
+        #firstOne
+        # count =0
+        # elemId =0
+        # for i in range(1,len(arr)):
+        #     if getCost(arr[0], arr[i]) == 1:
+        #         elemId = i
+        #         count+=1    #check for unique connections
+        # if count==1:
+        #     self.strings.append(arr[0] + arr[elemId][-1:])
+        #     arr.remove(arr[elemId])
+        #     arr.remove(arr[0])
+        # else:
+        #     self.strings.append(arr[0])
+        #     arr.remove(arr[0])
+        self.strings=self.getChunks(arr)
+        for i in range(len(self.strings)):
+            self.sequence.append(i)
+            print(i, "    ")
+            print(self.strings[i])
 
     def getChunks(self, array):
         localArray = deepcopy(array)
-        sizeOfMers = len(array[0])
         costs = getMatrixOfCosts(localArray)
 
         for row in range(len(localArray)):
             numOfNexts = 0
             potentialNextPosition = 0
             for col in range(len(localArray)):
-                # print("checking ", localArray[row], "with", localArray[col])
-                if (costs[row,col] == 1):
+                if (costs[row, col] == 1):
                     numOfNexts = numOfNexts + 1
                     # save the last (and hopefuly only) next one
                     potentialNextPosition = col
-            
+
             if (numOfNexts == 1):
                 # update in both places
-                # print("SQUASHING", localArray[row], "with", localArray[potentialNextPosition])
-                newValue = localArray[row] + localArray[potentialNextPosition][sizeOfMers-1:]
-                # print("BEFORE SQUASH", localArray)
-                localArray[:] = [newValue if (x == localArray[row] or x == localArray[potentialNextPosition]) else x for x in localArray]
-                # print("AFTER SQUASH", localArray)
-            # else:
-                # print("COULDN'T SQUASH", localArray[row])
-                # print(localArray)
+                newValue = localArray[row] + localArray[potentialNextPosition][-1:]
+                localArray[:] = [
+                    newValue if (x == localArray[row] or x == localArray[potentialNextPosition]) else x for x in
+                    localArray]
+
         return list(dict.fromkeys(localArray))
-
-                
-
-
 
 
 class GeneticGeneration:
-    def __init__(self, givenActualSpectr): #create initial sequences
-        self.spectrum = SpectrumSEQ(givenActualSpectr) #name might be misleading, this "spectrum" is set of SEQUENCES created from actual spectrum
+    generationSize = 10
+    chainLength = 50
+    def __init__(self, givenActualSpectr, length): #create initial sequences
+        self.spectrum = SpectrumSEQ(givenActualSpectr, length) #name might be misleading, this "spectrum" is set of SEQUENCES created from actual spectrum
         self.generation = self.createGeneration(spectrum=self.spectrum)
         self.Actualspectrum = givenActualSpectr
 
     def createGeneration(self, spectrum): #FIRST PREDEFINED!!!!
         generation = []
+        chunks = spectrum
+        rand=0
+        for i in range(self.generationSize):
+            chunks=spectrum
+            child=Unit()
+            child.sequence.append(chunks.sequence[0]) ##first predefined #{
+            #child.name += chunks.strings[0]
+            del chunks.sequence[0]
+            del chunks.strings[0]   #}
+            while len(chunks.sequence) > 0:
+                rand=random.randint(0,len(chunks.sequence))
+                child.sequence.append(chunks.sequence[rand])
+                #child.name += chunks.strings[rand]
+                del chunks.sequence[rand]
+                del chunks.strings[rand]
+            generation.append(child)
+            child.calculateFitness(spectrum, self.chainLength)
         return generation
 
     def chooseParents(self):
@@ -107,28 +145,33 @@ class GeneticGeneration:
                 return seq
 
     def offspringReplaceGenerationMember(self, mutants, ParentX, ParentY):
+        bestmutant = mutants[0]
         for mutant in mutants:
-            if mutant.fitness > ParentX.fitness:
-                self.findAndReplaceWeakestMember(mutant)
-                return True
-            elif mutant.fitness > ParentY.fitness:
-                self.findAndReplaceWeakestMember(mutant)
-                return True
+            if mutant.fitness > bestmutant.fitness:
+                bestmutant=mutant
+
+        if bestmutant.fitness > ParentX.fitness:
+            self.findAndReplaceWeakestMember(bestmutant)
+            return True
+        elif bestmutant.fitness > ParentY.fitness:
+            self.findAndReplaceWeakestMember(bestmutant)
+            return True
         return False
 
     def findAndReplaceWeakestMember(self, mutant):
         weakestMember = self.generation[0]
         for member in self.generation:
             if member.fitness<weakestMember.fitness:
-                weakestMember=member
+                weakestMember = member
         self.generation.remove(weakestMember)
         self.generation.append(mutant)
 
-    def selectBestCrossedOffspring(self, offspringTab):
+    def selectBestCrossedOffspring(self, offspringTab): #selects best offspring based on fitness
         bestoffspring = offspringTab[0]
-        bestoffspring.calculateFitness()
+        bestoffspring.calculateFitness(spectrum=self.spectrum, n=self.chainLength)
         for i in range(len(offspringTab)):
-            if offspringTab[i].calculateFitness() > bestoffspring.fitness:
+            offspringTab[i].calculateFitness(spectrum=self.spectrum, n=self.chainLength)
+            if offspringTab[i].fitness > bestoffspring.fitness:
                 bestoffspring = offspringTab[i]
         return bestoffspring
 
@@ -146,23 +189,23 @@ class GeneticGeneration:
                 else:
                     offspring.sequence.extend(parentY.sequence[j * chunkY:(j + 1) * chunkY])
             if random.randint(0, 1) < 1:
-                offspring.sequence.extend(parentX.sequence[len(parentX.sequence)-(partition-1*chunkX)])
+                offspring.sequence.extend(parentX.sequence[-(len(parentX.sequence)-(partition-1*chunkX)):]) #add remaining part, wchich is lenght (eg 9) - partition-1 times chunk (eg. 2x3),
             else:
-                offspring.sequence.extend(parentY.sequence[len(parentY.sequence)-(partition-1*chunkY)])
+                offspring.sequence.extend(parentY.sequence[partition-1*chunkY:])
             offspring.fixoffspring(self.spectrum)
             crossoverOffspringList.append(offspring)
         offspring = self.selectBestCrossedOffspring(crossoverOffspringList)
-        mutatedOffspring = self.mutateOffspring(offspring)
+        mutatedOffspring = self.mutateOffspring(offspring) #mutating only best fitting offspring
         mutatedOffspring.append(offspring)
         for mutant in mutatedOffspring:
-            mutant.calculateFitness(self.spectrum)
+            mutant.calculateFitness(spectrum=self.spectrum, n=self.chainLength)
         return self.offspringReplaceGenerationMember(mutatedOffspring, parentX, parentY) #return true if the generation changed
 
 
 if __name__ == '__main__':
-    testArray = ['TTCAGA', 'AAACTC', 'AGAGCT', 'CAAACT', 'CAGAGC', 'CCAAAC', 'CCCAAA', 'CCCCAA', 'CCTATT', 'CTGGTG', 'GAGCTG', 'GCTGGT', 'GGAGCC', 'GTATGG', 'GTGCCC', 'TCAGAG', 'TGCCCC']
-    
-    spec = SpectrumSEQ()
-    result = spec.getChunks(testArray)
+    testArray = ["CGAA", "GAAC", "AACT", "TTTA", "TTAC", "TTAG", "AAAA", "BCDE", "ABCD"]
+
+    spec = SpectrumSEQ(arr=testArray)
+
 
     print("Na wejsciu:", testArray, "\nNa chunki:", result)
