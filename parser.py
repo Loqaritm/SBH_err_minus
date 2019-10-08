@@ -14,9 +14,15 @@ positions = 5
 def getValuesFromUrl(N, K, sqne, pose, shouldPrint = False):
     url = "http://www.piotr.e.wawrzyniak.doctorate.put.poznan.pl/bio.php?n=" + str(N) +"&k="+ str(K) +"&mode=basic&intensity=0&position=1&sqpe=0&sqne=" + str(sqne) + "&pose=" + str(pose)
 
-    contents = urllib.request.urlopen(url)
-
-    root = ET.parse(contents).getroot()
+    flag = True
+    while(flag):
+        try:
+            contents = urllib.request.urlopen(url)
+            root = ET.parse(contents).getroot()
+            flag = False
+        except:
+            print("couldn't read")
+            pass
     
     if (shouldPrint):
         # just a check if works 
